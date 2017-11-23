@@ -88,6 +88,15 @@ if [[ $text =~ ^[a-zA-Z0-9/~\ \.]+(:[0-9]*)*:? ]]; then
 
 	if [[ -f $fnopos ]]; then
 		case $EDITOR in
+			*gvim*)
+				if [[ "${EDITOR}" == *"remote"* ]]; then
+					# if we invoke gvim with remote command (to open in existing instance)
+					# the +LINE won't work, so we use different method to move to that line
+					exec $EDITOR "+cal cursor($fline,0)" $fnopos
+				else
+					exec $EDITOR $fnopos +$fline
+				fi
+			;;
 			*vi*)
 				exec $EDITOR $fnopos +$fline
 			;;
