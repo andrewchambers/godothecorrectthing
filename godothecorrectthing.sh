@@ -53,7 +53,13 @@ manualexpand () {
 }
 
 cwd=$(manualexpand $cwd)
-text=$(xclip -o | head -n 1)
+
+type xclip 1>/dev/null 2>&1 && clip="xclip -o"
+type xsel 1>/dev/null 2>&1 && clip="xsel -o"
+[ -z "$clip" ] && echo "You need 'xclip' or 'xsel' for this script to work" && exit 1
+
+text=$($clip | head -n 1)
+[ -z "$text" ] && echo "nothing found in clopboard..." && exit 0
 
 case $text in
 	http://* | https://*)
