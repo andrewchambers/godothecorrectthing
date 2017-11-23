@@ -80,6 +80,7 @@ if [[ $text =~ ^[a-zA-Z0-9/~\ \.]+(:[0-9]*)*:? ]]; then
 	fi
 
 	fnopos=$fwithpos
+	fline=0
 	if [[ "${fwithpos}" == *":"* ]]; then
 		fnopos=${fwithpos%:*}
 		fline=${fwithpos#*:}
