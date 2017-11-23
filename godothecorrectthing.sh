@@ -5,7 +5,6 @@ set -u
 set -x
 
 editor=subl
-filemanager=pcmanfm
 
 guesscwdwithmagic () {
 	cwd=$HOME
