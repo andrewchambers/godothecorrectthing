@@ -26,13 +26,7 @@ guesscwdwithmagic () {
 		;;
 	esac
 
-	case $cwd in
-		~*)
-			cwd=$HOME/$(echo $cwd | cut -c 2-)
-		;;
-	esac
-
-	echo $cwd
+	echo $(readlink -f $cwd)
 }
 
 cwd=$(guesscwdwithmagic)
