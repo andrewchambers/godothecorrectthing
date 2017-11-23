@@ -4,7 +4,8 @@ set -e
 set -u
 set -x
 
-editor=subl
+# use the standard $EDITOR variable
+: "${EDITOR:=subl}" # initialize it with default, if empty
 
 guesscwdwithmagic () {
 	cwd=$HOME
@@ -76,7 +77,7 @@ then
 	then
 		case $fnopos in
 			*)
-				exec $editor $fwithpos
+				exec $EDITOR $fwithpos
 			;;
 		esac
 	fi
