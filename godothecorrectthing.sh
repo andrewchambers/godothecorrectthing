@@ -69,7 +69,7 @@ if [[ "$text" == *"://"* ]]; then
 	exec xdg-open "$text"
 fi
 
-if [[ $text =~ ^[a-zA-Z/~\ \.]+(:[0-9]*)*:? ]]; then
+if [[ $text =~ ^[a-zA-Z0-9/~\ \.]+(:[0-9]*)*:? ]]; then
 	fwithpos=$(manualexpand $text)
 
 	# strip trailing :, go error messages are one place this happens
