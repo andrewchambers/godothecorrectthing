@@ -11,6 +11,7 @@ guesscwdwithmagic () {
 	cwd=$HOME
 
 	wintitle=$(xdotool getactivewindow getwindowname)
+	winpid=$(xdotool getactivewindow getwindowpid)
 	case $wintitle in
 		nixos:*:*)
 			cwd=`echo $wintitle | cut -d : -f 3-`
@@ -19,9 +20,18 @@ guesscwdwithmagic () {
 			cwd=`echo $wintitle | cut -d ' ' -f 1`
 			cwd=`dirname $cwd`
 		;;
+		*Konsole*)
+			# get the active session from the first Konsole window (hopefully you use just one konsole)
+			dbus_output=$(dbus-send --session --print-reply=literal  --dest=org.kde.konsole-$winpid /Windows/1 org.kde.konsole.Window.currentSession)
+			active_session="${dbus_output##* }"
+
+			# get the shell pid running in the Konsole session
+			dbus_output=$(dbus-send --session --print-reply=literal  --dest=org.kde.konsole-$winpid /Sessions/$active_session org.kde.konsole.Session.processId)
+			shell_pid="${dbus_output##* }"
+			cwd=$(readlink -f /proc/$shell_pid/cwd)
+		;;
 		*)
 			# get the CWD of the running app
-			winpid=$(xdotool getactivewindow getwindowpid)
 			cwd=$(readlink -f /proc/$winpid/cwd)
 		;;
 	esac
