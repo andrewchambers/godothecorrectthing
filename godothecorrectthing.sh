@@ -1,15 +1,17 @@
-#! /bin/sh
+#!/bin/bash
 
 set -e
 set -u
 set -x
 
-editor=subl
+# use the standard $EDITOR variable
+: "${EDITOR:=subl}" # initialize it with default, if empty
 
 guesscwdwithmagic () {
 	cwd=$HOME
 
 	wintitle=$(xdotool getactivewindow getwindowname)
+	winpid=$(xdotool getactivewindow getwindowpid)
 	case $wintitle in
 		nixos:*:*)
 			cwd=`echo $wintitle | cut -d : -f 3-`
@@ -18,15 +20,23 @@ guesscwdwithmagic () {
 			cwd=`echo $wintitle | cut -d ' ' -f 1`
 			cwd=`dirname $cwd`
 		;;
-	esac
+		*Konsole*)
+			# get the active session from the first Konsole window (hopefully you use just one konsole)
+			dbus_output=$(dbus-send --session --print-reply=literal  --dest=org.kde.konsole-$winpid /Windows/1 org.kde.konsole.Window.currentSession)
+			active_session="${dbus_output##* }"
 
-	case $cwd in
-		~*)
-			cwd=$HOME/$(echo $cwd | cut -c 2-)
+			# get the shell pid running in the Konsole session
+			dbus_output=$(dbus-send --session --print-reply=literal  --dest=org.kde.konsole-$winpid /Sessions/$active_session org.kde.konsole.Session.processId)
+			shell_pid="${dbus_output##* }"
+			cwd=$(readlink -f /proc/$shell_pid/cwd)
+		;;
+		*)
+			# get the CWD of the running app
+			cwd=$(readlink -f /proc/$winpid/cwd)
 		;;
 	esac
 
-	echo $cwd
+	echo $(readlink -f $cwd)
 }
 
 cwd=$(guesscwdwithmagic)
@@ -43,46 +53,73 @@ manualexpand () {
 		*)
 			echo $cwd/$1
 		;;
-	esac	
+	esac
 }
 
 cwd=$(manualexpand $cwd)
-text=$(xclip -o | head -n 1)
 
-case $text in
-	http://* | https://*)
-		exec xdg-open $text
-	;;
-esac
+type xclip 1>/dev/null 2>&1 && clip="xclip -o"
+type xsel 1>/dev/null 2>&1 && clip="xsel -o"
+[ -z "$clip" ] && echo "You need 'xclip' or 'xsel' for this script to work" && exit 1
 
-if echo $text  | grep -q -E '^[a-zA-Z/~ \.]+(:[0-9]*)*:?'
-then
+text=$($clip | head -n 1)
+[ -z "$text" ] && echo "nothing found in clipboard..." && exit 0
+
+if [[ "$text" == *"://"* ]]; then
+	exec xdg-open "$text"
+fi
+
+if [[ $text =~ ^[a-zA-Z0-9/~\ \.]+(:[0-9]*)*:? ]]; then
 	fwithpos=$(manualexpand $text)
 
 	# strip trailing :, go error messages are one place this happens
-	case $(echo $fwithpos | rev) in
-		:*)
-			fwithpos=$(echo $fwithpos | rev | cut -c 2- | rev)
-		;;
-	esac
-
-	fnopos=$fwithpos
-	if echo $fwithpos | grep -q -E ':'
-	then
-		fnopos=`echo $fnopos | cut -d : -f 1`
+	# match last character, if it's ":" -> remove it
+	if [ "${fwithpos: -1}" == ":" ]; then
+		fwithpos=${fwithpos: : -1} # strip last character
+		# https://unix.stackexchange.com/a/144330/19795 for more info
 	fi
 
-	if test -f $fnopos
-	then
-		case $fnopos in
+	fnopos=$fwithpos
+	fline=0
+	if [[ "${fwithpos}" == *":"* ]]; then
+		fnopos=${fwithpos%:*}
+		fline=${fwithpos#*:}
+	fi
+
+	if [[ -f $fnopos ]]; then
+		case $EDITOR in
+			*gvim*)
+				if [[ $fline -gt 0 ]]; then
+					if [[ "${EDITOR}" == *"remote"* ]]; then
+						# if we invoke gvim with remote command (to open in existing instance)
+						# the +LINE won't work, so we use different method to move to that line
+						exec $EDITOR "+cal cursor($fline,0)" $fnopos
+					else
+						exec $EDITOR $fnopos +$fline
+					fi
+				else
+					exec $EDITOR $fnopos
+				fi
+			;;
+			*vi*)
+				if [[ $fline -gt 0 ]]; then
+					exec $EDITOR $fnopos +$fline
+				else
+					exec $EDITOR $fnopos
+				fi
+			;;
+			subl*)
+				exec $EDITOR $fwithpos
+			;;
 			*)
-				exec $editor $fwithpos
+				# most editors would not understand "/path/to/file:123", so we give only the file part
+				exec $EDITOR $fnopos
 			;;
 		esac
 	fi
 
-	if test -d $fnopos
-	then
+	if [[ -d $fnopos ]]; then
 		exec xdg-open $fnopos
 	fi
 fi
+
