@@ -4,7 +4,6 @@ set -e
 set -u
 set -x
 
-browser=chromium
 editor=subl
 filemanager=pcmanfm
 
@@ -53,7 +52,7 @@ text=$(xclip -o | head -n 1)
 
 case $text in
 	http://* | https://*)
-		exec $browser $text
+		exec xdg-open $text
 	;;
 esac
 
@@ -71,7 +70,7 @@ then
 	fnopos=$fwithpos
 	if echo $fwithpos | grep -q -E ':'
 	then
-		fnopos=`echo $f | cut -d : -f 1`
+		fnopos=`echo $fnopos | cut -d : -f 1`
 	fi
 
 	if test -f $fnopos
@@ -85,7 +84,6 @@ then
 
 	if test -d $fnopos
 	then
-		cd $fnopos
-		exec $filemanager 
+		exec xdg-open $fnopos
 	fi
 fi
