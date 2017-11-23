@@ -19,6 +19,11 @@ guesscwdwithmagic () {
 			cwd=`echo $wintitle | cut -d ' ' -f 1`
 			cwd=`dirname $cwd`
 		;;
+		*)
+			# get the CWD of the running app
+			winpid=$(xdotool getactivewindow getwindowpid)
+			cwd=$(readlink -f /proc/$winpid/cwd)
+		;;
 	esac
 
 	case $cwd in
