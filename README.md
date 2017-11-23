@@ -15,6 +15,7 @@ As it stands, the tool is difficult to package because it does a lot of
 - You need to read your window manager docs to setup a hotkey to run this script.
   In my case, I use the i3 window manager so I had to add ``` bindsym $mod+g exec /home/ac/bin/godothecorrectthing.sh ```
   to the i3 config file.
+  For `KDE`, go to `SystemSettings`->`Shortcuts`->`CustomShortcuts`, then add `New`->`GlobalShortcut`->`Command`.
 - You need to configure your software to have a window title that contains the current working directory, for me, my operating system PS1 variable
   made it work for xterm and sublime text did this automatically. Being able to read the current directory from the window title is important
   so the script can open 'bare' file names like 'main.go' in the example video.
