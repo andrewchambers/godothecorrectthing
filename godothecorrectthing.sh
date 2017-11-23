@@ -49,7 +49,7 @@ manualexpand () {
 		*)
 			echo $cwd/$1
 		;;
-	esac	
+	esac
 }
 
 cwd=$(manualexpand $cwd)
@@ -61,40 +61,43 @@ type xsel 1>/dev/null 2>&1 && clip="xsel -o"
 text=$($clip | head -n 1)
 [ -z "$text" ] && echo "nothing found in clopboard..." && exit 0
 
-case $text in
-	http://* | https://*)
-		exec xdg-open $text
-	;;
-esac
+if [[ "$text" == *"://"* ]]; then
+	exec xdg-open "$text"
+fi
 
-if echo $text  | grep -q -E '^[a-zA-Z/~ \.]+(:[0-9]*)*:?'
-then
+if [[ $text =~ ^[a-zA-Z/~\ \.]+(:[0-9]*)*:? ]]; then
 	fwithpos=$(manualexpand $text)
 
 	# strip trailing :, go error messages are one place this happens
-	case $(echo $fwithpos | rev) in
-		:*)
-			fwithpos=$(echo $fwithpos | rev | cut -c 2- | rev)
-		;;
-	esac
-
-	fnopos=$fwithpos
-	if echo $fwithpos | grep -q -E ':'
-	then
-		fnopos=`echo $fnopos | cut -d : -f 1`
+	# match last character, if it's ":" -> remove it
+	if [ "${fwithpos: -1}" == ":" ]; then
+		fwithpos=${fwithpos: : -1} # strip last character
+		# https://unix.stackexchange.com/a/144330/19795 for more info
 	fi
 
-	if test -f $fnopos
-	then
-		case $fnopos in
-			*)
+	fnopos=$fwithpos
+	if [[ "${fwithpos}" == *":"* ]]; then
+		fnopos=${fwithpos%:*}
+		fline=${fwithpos#*:}
+	fi
+
+	if [[ -f $fnopos ]]; then
+		case $EDITOR in
+			*vi*)
+				exec $EDITOR $fnopos +$fline
+			;;
+			subl*)
 				exec $EDITOR $fwithpos
+			;;
+			*)
+				# most editors would not understand "/path/to/file:123", so we give only the file part
+				exec $EDITOR $fnopos
 			;;
 		esac
 	fi
 
-	if test -d $fnopos
-	then
+	if [[ -d $fnopos ]]; then
 		exec xdg-open $fnopos
 	fi
 fi
+
