@@ -134,7 +134,6 @@ then
 		nresults=$(wc -l $searchresultsf | cut -d ' ' -f 1)
 		if test $nresults -gt 1
 		then
-			echo foobar
 			match=$(cat $searchresultsf | dmenu -l 10 | cut -d : -f 1-2)
 		elif test $nresults -gt 0
 		then
