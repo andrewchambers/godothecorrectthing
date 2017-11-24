@@ -4,7 +4,7 @@ set -e
 set -u
 set -x
 
-# N.B. This disables globbingg.
+# N.B. This disables globbing.
 # If you need it, enable it temporarily.
 # This script turns it off because it deals with
 # strings that look like paths, but we don't always
