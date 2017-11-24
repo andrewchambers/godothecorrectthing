@@ -7,13 +7,14 @@ With this you can:
 - Select any compiler error text in any terminal and open the correct file and line in your text editor.
 - Click on the output of ls in any terminal and open the corresponding file with the correct program.
 - Open any url from any text on your OS and open it in your browser.
+- Do simple code search and setup text links/bookmarks without any editor support.
 
 # How to use
 
-As it stands, the tool is difficult to package because it does a lot of 
+As it stands, the tool is difficult to package because it does a lot of user/software specific stuff.
 
 - You need to read your window manager docs to setup a hotkey to run this script.
-  In my case, I use the i3 window manager so I had to add ``` bindsym $mod+g exec /home/ac/bin/godothecorrectthing.sh ```
+  For `i3` add something like `bindsym $mod+g exec /home/ac/bin/godothecorrectthing.sh`
   to the i3 config file.
   For `KDE`, go to `SystemSettings`->`Shortcuts`->`CustomShortcuts`, then add `New`->`GlobalShortcut`->`Command`.
 - You need to configure your software to have a window title that contains the current working directory, for me, my operating system PS1 variable
