@@ -25,5 +25,5 @@ As it stands, the tool is difficult to package because it does a lot of user/sof
   home directory instead of what you intended.
 - You need to customize the code which executes actions to run your desired software.
 
-Read more [here](https://acha.ninja/integrated_development_window_manager.html)
+Read more, and watch demo videos [here](https://acha.ninja/integrated_development_window_manager.html)
 
