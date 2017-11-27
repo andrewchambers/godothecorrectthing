@@ -11,7 +11,8 @@ With this you can:
 
 # How to use
 
-As it stands, the tool is difficult to package because it does a lot of user/software specific stuff.
+Although I use it this tool every day, It is not packaged in a friendly way (yet), so 
+as it stands, you probably need to fork it and read the code to make minor modifications to get it working.
 
 - You need to read your window manager docs to setup a hotkey to run this script.
   For `i3` add something like `bindsym $mod+g exec /home/ac/bin/godothecorrectthing.sh`
