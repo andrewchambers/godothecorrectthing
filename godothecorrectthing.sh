@@ -15,13 +15,22 @@ editor=subl
 
 guesscwdwithmagic () {
 	cwd=$HOME
-
+	winprog=$(ps -o comm,args -p `xdotool getwindowfocus getwindowpid` | tail -n 1)
 	wintitle=$(xdotool getactivewindow getwindowname)
-	case $wintitle in
-		nixos:*:*)
-			cwd=`echo $wintitle | cut -d : -f 3-`
+	case $winprog in
+		*xterm*)
+			cwd=`echo $wintitle | cut -d : -f 2- | sed 's/^ //'`
 		;;
-		*Sublime\ Text)
+		*terminator*)
+			cwd=`echo $wintitle | sed 's/^.*@.*: //'`
+		;;
+		*gedit*)
+			cwd=`echo $wintitle | awk -F'[()]' '{print $2}'`
+		;;
+		*geany*)
+			cwd=`echo $wintitle | awk -F '-' '{print $2}' | sed 's/^ //'`
+		;;
+		*subl*)
 			cwd=`echo $wintitle | cut -d ' ' -f 1`
 			cwd=`dirname $cwd`
 		;;
