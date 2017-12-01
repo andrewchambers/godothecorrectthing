@@ -81,21 +81,12 @@ esac
 if echo "$text" | grep -q -E '^[_a-zA-Z0-9/~ \.]+:[0-9]+(:[0-9]+)?:?'
 then
 	f=$(manualexpand $(echo $text | cut -d : -f 1))
-	pos=$(echo $text | cut -d : -f 2-)
-	fwithpos=$f:$pos
-
 	# strip trailing :, go error messages are one place this happens
-	case $fwithpos in
-		*:)
-			fwithpos=$(echo $fwithpos | rev | cut -c 2- | rev)
-		;;
-	esac
-
-	fnopos=`echo $fwithpos | cut -d : -f 1`
+	pos=$(echo $text | cut -d : -f 2- | sed 's/:$//')
 	
-	if test -f $fnopos
+	if test -f $f
 	then
-		exec $editor $fwithpos
+		exec $editor $f:$pos
 	fi
 fi
 
@@ -163,11 +154,12 @@ then
 	f=$(manualexpand $text)
 	if test -e $f
 	then
-		case $f in
+		mime_type=$(file --mime-type $f | cut -d ' ' -f2)
+		case $mime_type in
 			# because xdg-open cannot handle line numbers
 			# anyway, we must have the $editor hack.
 			# We should use it for text files for consistency.
-			*.c | *.go | *.md | *.txt)
+			text/* | application/x-shellscript)
 				exec $editor $f	
 			;;
 		esac
