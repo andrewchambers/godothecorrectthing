@@ -81,21 +81,12 @@ esac
 if echo "$text" | grep -q -E '^[_a-zA-Z0-9/~ \.]+:[0-9]+(:[0-9]+)?:?'
 then
 	f=$(manualexpand $(echo $text | cut -d : -f 1))
-	pos=$(echo $text | cut -d : -f 2-)
-	fwithpos=$f:$pos
-
 	# strip trailing :, go error messages are one place this happens
-	case $fwithpos in
-		*:)
-			fwithpos=$(echo $fwithpos | rev | cut -c 2- | rev)
-		;;
-	esac
-
-	fnopos=`echo $fwithpos | cut -d : -f 1`
+	pos=$(echo $text | cut -d : -f 2- | sed 's/:$//')
 	
-	if test -f $fnopos
+	if test -f $f
 	then
-		exec $editor $fwithpos
+		exec $editor $f:$pos
 	fi
 fi
 
