@@ -154,11 +154,12 @@ then
 	f=$(manualexpand $text)
 	if test -e $f
 	then
-		case $f in
+		mime_type=$(file --mime-type $f | cut -d ' ' -f2)
+		case $mime_type in
 			# because xdg-open cannot handle line numbers
 			# anyway, we must have the $editor hack.
 			# We should use it for text files for consistency.
-			*.c | *.go | *.md | *.txt)
+			text/* | application/x-shellscript)
 				exec $editor $f	
 			;;
 		esac
