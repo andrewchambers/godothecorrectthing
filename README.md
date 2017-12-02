@@ -31,4 +31,4 @@ Read more, and watch demo videos [here](https://acha.ninja/integrated_developmen
 # Other places to look for inspiration
 
 - [A tour of acme](https://research.swtch.com/acme)
-- [controlling music and other things from dmenu](https://github.com/halfwit/dotfiles)
+- [Controlling music and other things from dmenu](https://github.com/halfwit/dotfiles)
