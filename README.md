@@ -26,7 +26,7 @@ as it stands, you probably need to fork it and read the code to make minor modif
   home directory instead of what you intended.
 - You need to customize the code which executes actions to run your desired software.
 
-Read more, and watch demo videos [here](https://acha.ninja/integrated_development_window_manager.html)
+Demo videos - [original](https://www.youtube.com/watch?v=PrBDJd4Qgzs) and [followup](https://www.youtube.com/watch?v=bsUPE5W-NmI)
 
 # Other places to look for inspiration
 
